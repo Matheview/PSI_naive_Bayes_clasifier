@@ -64,7 +64,8 @@ def file_open(filename):
                             inside.append(value)
                     if not tab:
                         length = len(inside)
-                    tab.append(inside)
+                    if inside not in tab:
+                        tab.append(inside)
             savetofile(tab)
             return tab
     except Exception:
@@ -150,7 +151,7 @@ def comparedicts(testvalues, decision_dict, probability_dict, dataset):
             result_dict = key
             max = result
     if max > 0:
-        savenewvalues(testvalues, result_dict)
+        # savenewvalues(testvalues, result_dict)
         return "decyzja = {} o wartości {}".format(result_dict, max)
     return "nie znaleziono odpowiedniej decyzji"
 
