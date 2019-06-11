@@ -23,7 +23,7 @@ def savenewvalues(testvalues, result_dict):
         string = ''
         for value in testvalues:
             string += "{};".format(value)
-        string += result_dict+"\n"
+        string += str(result_dict)+"\n"
         save_to.write(string)
 
 
@@ -50,9 +50,13 @@ def file_open(filename):
         with open(filename, "r") as f:
             lines = f.readlines()
             for num, line in enumerate(lines):
-                line = re.sub('[^A-Za-z0-9.|;,-]+', '', line)
-                line = line.replace('|', ';')
-                line = line.split(";")
+                if ';' in line:
+                    line = re.sub('[^A-Za-z0-9.|;,-]+', '', line)
+                    line = line.replace('|', ';')
+                    line = line.split(";")
+                if ' ' in line:
+                    line = line.replace('\n', '')
+                    line = line.split(" ")
                 inside = []
                 if len(line) != length and tab:
                     pass
@@ -65,11 +69,15 @@ def file_open(filename):
                             inside.append(value)
                     if not tab:
                         length = len(inside)
+                    try:
+                        inside.remove('')
+                    except:
+                        pass
                     tab.append(inside)
             savetofile(tab)
             print("Znaleziono prztworzony plik {}".format(filename))
             return tab
-    except Exception:
+    except Exception as e:
         print("Nie znaleziono pliku")
         sys.exit(0)
 
@@ -161,9 +169,9 @@ def comparedicts(testvalues, decision_dict, probability_dict, dataset):
     if max > 0:
         if count == 1:
             savenewvalues(testvalues, result_dict)
-            return "decyzja = {} o wartości {}".format(result_dict, max)
+            return "decyzja = {} o wartości +- {}".format(result_dict, max)
         elif count > 1:
-            return "decyzja jest niejednoznaczna: [ {}] o wartości: {}".format(string, max)
+            return "decyzja jest niejednoznaczna: [ {}] o wartości +- {}".format(string, max)
     return "nie znaleziono odpowiedniej decyzji"
 
 
