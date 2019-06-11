@@ -149,7 +149,6 @@ def classifier(dataset, testvalues, decisions):
                         count_values += 1
             try:
                 main_decisions *= count_values / count_decisions
-                print(main_decisions)
             except ZeroDivisionError:
                 main_decisions = 0
         try:
