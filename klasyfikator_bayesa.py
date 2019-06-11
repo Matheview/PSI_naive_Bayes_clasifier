@@ -1,3 +1,4 @@
+# coding=utf-8
 import sys
 import re
 
@@ -64,8 +65,7 @@ def file_open(filename):
                             inside.append(value)
                     if not tab:
                         length = len(inside)
-                    if inside not in tab:
-                        tab.append(inside)
+                    tab.append(inside)
             savetofile(tab)
             return tab
     except Exception:
@@ -151,8 +151,17 @@ def comparedicts(testvalues, decision_dict, probability_dict, dataset):
             result_dict = key
             max = result
     if max > 0:
-        # savenewvalues(testvalues, result_dict)
-        return "decyzja = {} o wartości {}".format(result_dict, max)
+        count = 0
+        string = ''
+        for key, value in decision_dict.items():
+            if probability_dict[key] * value == max:
+                string += '{} '.format(key)
+                count += 1
+        if count == 1:
+            savenewvalues(testvalues, result_dict)
+            return "decyzja = {} o wartości {}".format(result_dict, max)
+        elif count > 1:
+            return "decyzja jest niejednoznaczna: [ {}] o wartości: {}".format(string, max)
     return "nie znaleziono odpowiedniej decyzji"
 
 
