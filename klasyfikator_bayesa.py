@@ -1,6 +1,7 @@
 # coding=utf-8
 import sys
 import re
+import os
 
 tab = []
 file = ''
@@ -50,6 +51,10 @@ def file_open(filename):
         with open(filename, "r") as f:
             lines = f.readlines()
             for num, line in enumerate(lines):
+                if '\t' in line:
+                    line = line.replace(' ', '')
+                    line = line.replace('\n', '')
+                    line = line.split("\t")
                 if ';' in line:
                     line = re.sub('[^A-Za-z0-9.|;,-]+', '', line)
                     line = line.replace('|', ';')
@@ -65,7 +70,7 @@ def file_open(filename):
                         try:
                             value = value.replace(',', '.')
                             inside.append(float(value))
-                        except Exception as e:
+                        except Exception:
                             inside.append(value)
                     if not tab:
                         length = len(inside)
@@ -75,7 +80,6 @@ def file_open(filename):
                         pass
                     tab.append(inside)
             savetofile(tab)
-            print("Znaleziono prztworzony plik {}".format(filename))
             return tab
     except Exception as e:
         print("Nie znaleziono pliku")
@@ -89,7 +93,10 @@ def proposal_values(dataset):
         for num, line in enumerate(dataset):
             if dataset[num][i] not in unique:
                 unique.append(dataset[num][i])
-        unique.sort()
+        try:
+            unique.sort()
+        except:
+            pass
         tab.append(unique)
     print('\nWystępujące wartości:')
     for i in range(len(dataset[0])):
@@ -105,10 +112,10 @@ def get_test_values(dataset):
     i = 0
     while i < len(dataset[0])-1:
         try:
-            if isinstance(tab[i][0], float):
+            if isinstance(tab[0][i], float):
                 val = float(input("Podaj wartość {}:   ".format(i + 1)))
                 testvalues.append(val)
-            elif isinstance(tab[i][0], str):
+            if isinstance(tab[0][i], str):
                 val = input("Podaj wartość {}:   ".format(i + 1))
                 testvalues.append(val)
             i += 1
@@ -142,6 +149,7 @@ def classifier(dataset, testvalues, decisions):
                         count_values += 1
             try:
                 main_decisions *= count_values / count_decisions
+                print(main_decisions)
             except ZeroDivisionError:
                 main_decisions = 0
         try:
@@ -183,17 +191,24 @@ def naive_bayes_classifier_main(dataset, testvalues, decisions):
 
 if __name__ == '__main__':
     file = input("Podaj nazwę pliku:  ")
-    try:
-        dataset = open_exist(file)
-        print("Znaleziono przetworzony już wcześniej plik learned_{}".format(file))
-    except:
-        dataset = file_open(file)
+    if os.path.isfile("learned_"+file):
+        try:
+            dataset = open_exist(file)
+            print("Znaleziono przetworzony już wcześniej plik learned_{}".format(file))
+        except:
+            dataset = file_open(file)
+    else:
+        try:
+            dataset = file_open(file)
+        except:
+            print("Wystąpił nieoczekiwany błąd")
+            sys.exit(0)
     while True:
+        decisions = proposal_values(dataset)
+        test_values = get_test_values(dataset)
+        naive_bayes_classifier_main(dataset, test_values, decisions)
         try:
             dataset = open_exist(file)
         except:
             dataset = file_open(file)
-        decisions = proposal_values(dataset)
-        test_values = get_test_values(dataset)
-        naive_bayes_classifier_main(dataset, test_values, decisions)
 
