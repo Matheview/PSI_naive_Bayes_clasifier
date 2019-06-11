@@ -3,7 +3,7 @@ import sys
 import re
 
 tab = []
-file = "learning.txt"
+file = ''
 
 
 def savetofile(dataset):
@@ -67,6 +67,7 @@ def file_open(filename):
                         length = len(inside)
                     tab.append(inside)
             savetofile(tab)
+            print("Znaleziono prztworzony plik {}".format(filename))
             return tab
     except Exception:
         print("Nie znaleziono pliku")
@@ -144,19 +145,20 @@ def classifier(dataset, testvalues, decisions):
 
 def comparedicts(testvalues, decision_dict, probability_dict, dataset):
     result_dict = ''
+    string = ''
+    count = 0
     max = 0
     for key, value in decision_dict.items():
         result = value * probability_dict[key]
         if result > max:
             result_dict = key
             max = result
+            string = '{} '.format(key)
+            count = 1
+        elif result == max:
+            string += '{} '.format(key)
+            count += 1
     if max > 0:
-        count = 0
-        string = ''
-        for key, value in decision_dict.items():
-            if probability_dict[key] * value == max:
-                string += '{} '.format(key)
-                count += 1
         if count == 1:
             savenewvalues(testvalues, result_dict)
             return "decyzja = {} o wartości {}".format(result_dict, max)
@@ -172,6 +174,12 @@ def naive_bayes_classifier_main(dataset, testvalues, decisions):
 
 
 if __name__ == '__main__':
+    file = input("Podaj nazwę pliku:  ")
+    try:
+        dataset = open_exist(file)
+        print("Znaleziono przetworzony już wcześniej plik learned_{}".format(file))
+    except:
+        dataset = file_open(file)
     while True:
         try:
             dataset = open_exist(file)
